@@ -7,14 +7,15 @@ This assignment makes use of data from a personal activity monitoring device. Th
 
 SECTION 1: Calculating and plotting the mean of the total number of steps per day
 Step 1: Load the data from the source file
-```{r, echo=TRUE}
+
+```r
 # Load the raw activity data
 
 raw_activity_data <- read.csv("activity.csv",header = TRUE)
 ```
 Step 2: Process the raw data to make it for  analysis
-```{r, echo=TRUE}
 
+```r
 # Load reshape2,ggplot2 adn gridExtra library to get melt & dcast functions
 
 library(reshape2)
@@ -30,20 +31,37 @@ activity_melt_data <- melt(raw_activity_data,id.vars = "date",measure.vars = "st
 activity_Cast_data <- dcast(activity_melt_data,date ~ variable, sum)
 ```
 
-```{r, echo=TRUE}
+
+```r
 # Plot histogram of daily steps
 daily_steps <- mean(activity_Cast_data$steps, na.rm=TRUE)
 median_steps <- median(activity_Cast_data$steps,na.rm = TRUE)
 
 plot(activity_Cast_data$date, activity_Cast_data$steps, type="h", main="Histogram of Daily Steps", xlab="Date", ylab="Steps per Day", col="green", lwd=8)
 abline(h=daily_steps, col="red", lwd=2)
+```
 
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
+
+```r
 paste("Mean Steps per Day =",daily_steps)
+```
+
+```
+## [1] "Mean Steps per Day = 10766.1886792453"
+```
+
+```r
 paste("Median Steps per Day =",median_steps)
 ```
 
+```
+## [1] "Median Steps per Day = 10765"
+```
+
 SECTION 2: Find the average daily activity pattern
-```{r, echo=TRUE}
+
+```r
 # melt the data frame by Interval
 activity_melt_Interval <- melt(raw_activity_data,id.vars="interval", measure.vars="steps", na.rm=TRUE)
 
@@ -56,20 +74,41 @@ mean_steps <- mean(activity_Cast_Interval$steps,na.rm = TRUE)
 
 plot(activity_Cast_Interval$interval,activity_Cast_Interval$steps, type = "l", col="green",main="Frequency of Steps Taken at Each Interval", xlab="Interval", ylab="Steps",lwd =3)
 abline(h=mean_steps,col='red',lwd=3)
+```
 
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
+
+```r
 #Interval with max value
 paste("Interval with max value =", activity_Cast_Interval$interval[which(activity_Cast_Interval$steps == max(activity_Cast_Interval$steps))])
+```
 
+```
+## [1] "Interval with max value = 835"
+```
+
+```r
 #Maximum interval mean steps 
 paste("Maximum interval mean steps =", max(activity_Cast_Interval$steps))
 ```
 
+```
+## [1] "Maximum interval mean steps = 206.169811320755"
+```
+
 SECTION 3: Imputing missing values to replace NAs in data set and compare results
 
-```{r, echo=TRUE}
+
+```r
 # Calculate number of rows in activity data set with NA rows
 sum(is.na(raw_activity_data$steps))
+```
 
+```
+## [1] 2304
+```
+
+```r
 #Mean steps per Interval
 steps_per_Interval <- activity_Cast_Interval
 
@@ -91,17 +130,32 @@ cast_no_na_data <- dcast(melt_no_na_data,date ~ variable, sum)
 
 plot(cast_no_na_data$date, cast_no_na_data$steps, type="h", main="Histogram of Daily Steps ", xlab="Date", ylab="Steps", col="green", lwd=6)
 abline(h=mean(cast_no_na_data$steps), col="red", lwd=2)
+```
 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
+
+```r
 # Calculate mean and median of daily steps
 paste("Mean daily steps =", mean(cast_no_na_data$steps, na.rm=TRUE))
+```
+
+```
+## [1] "Mean daily steps = 10889.7992576554"
+```
+
+```r
 paste("Median daily steps =", median(cast_no_na_data$steps, na.rm=TRUE))
+```
+
+```
+## [1] "Median daily steps = 11015"
 ```
 
 
 SECTION 4: Find differences in activity patterns between weekdays and weekends
 
-```{r, echo=TRUE}
 
+```r
 for (i in 1:nrow(no_na_data)) {
   if (weekdays(no_na_data$date[i]) == "Saturday" | weekdays(no_na_data$date[i]) == "Sunday") {
     no_na_data$dayOfWeek[i] = "weekend"
@@ -125,3 +179,5 @@ plot_a <- qplot(cast_weekday$interval, cast_weekday$steps, geom="line", data=cas
 plot_b <- qplot(cast_weekend$interval, cast_weekend$steps, geom="line", data=cast_weekend,  main="Steps by Interval - Weekend",xlab="Interval", ylab="No. of Steps")
 grid.arrange(plot_a, plot_b ,nrow=2)
 ```
+
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png)
